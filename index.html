@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>筑境设计 | 城市规划与建筑设计研究院</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+  :root {
+    --color-bg: #0a0a0a;
+    --color-surface: #141414;
+    --color-card: #1a1a1a;
+    --color-border: #2a2a2a;
+    --color-text: #e8e4df;
+    --color-text-muted: #8a8580;
+    --color-accent: #c8a87c;
+    --color-accent-light: #e0c9a6;
+    --color-accent-dark: #9a7d5a;
+    --font-serif: 'Noto Serif SC', 'Songti SC', serif;
+    --font-sans: 'Noto Sans SC', 'PingFang SC', sans-serif;
+    --max-width: 1400px;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-accent-dark) var(--color-bg);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.7;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== PRELOADER ===== */
+  #preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--color-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  #preloader.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .loader-line {
+    width: 120px;
+    height: 1px;
+    background: var(--color-border);
+    position: relative;
+    overflow: hidden;
+  }
+  .loader-line::after {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background: var(--color-accent);
+    animation: loaderSlide 1.5s ease infinite;
+  }
+  @keyframes loaderSlide {
+    0% { left: -100%; }
+    50% { left: 0; }
+    100% { left: 100%; }
+  }
+
+  /* ===== CURSOR ===== */
+  .cursor-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--color-accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.15s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--color-accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9997;
+    transition: transform 0.3s var(--ease-out), width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring.hover {
+    width: 60px;
+    height: 60px;
+    border-color: var(--color-accent-light);
+  }
+
+  /* ===== NAVIGATION ===== */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 0 60px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.4s ease, backdrop-filter 0.4s ease;
+  }
+  nav.scrolled {
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .nav-logo {
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: 0.05em;
+    text-decoration: none;
+  }
+  .nav-logo span {
+    color: var(--color-accent);
+  }
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--color-accent);
+    transition: width 0.4s var(--ease-out);
+  }
+  .nav-links a:hover { color: var(--color-text); }
+  .nav-links a:hover::after { width: 100%; }
+
+  .nav-menu-btn {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 8px;
+  }
+  .nav-menu-btn span {
+    width: 28px;
+    height: 1.5px;
+    background: var(--color-text);
+    transition: all 0.3s ease;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .hero-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.3) contrast(1.1);
+    transform: scale(1.05);
+    transition: transform 8s ease;
+  }
+  .hero:hover .hero-bg-img {
+    transform: scale(1);
+  }
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, var(--color-bg) 0%, transparent 50%, rgba(10,10,10,0.3) 100%);
+  }
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    width: 100%;
+  }
+  .hero-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 24px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 1s var(--ease-out) 0.5s forwards;
+  }
+  .hero h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 32px;
+    opacity: 0;
+    transform: translateY(50px);
+    animation: fadeUp 1.2s var(--ease-out) 0.7s forwards;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--color-accent);
+  }
+  .hero-desc {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    max-width: 560px;
+    line-height: 1.9;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 1s var(--ease-out) 0.9s forwards;
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: fadeUp 1s var(--ease-out) 1.2s forwards;
+  }
+  .hero-scroll span {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: var(--color-border);
+    position: relative;
+    overflow: hidden;
+  }
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    width: 100%;
+    height: 50%;
+    background: var(--color-accent);
+    animation: scrollDown 2s ease infinite;
+  }
+  @keyframes scrollDown {
+    0% { top: -50%; }
+    100% { top: 150%; }
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== SECTION COMMON ===== */
+  section {
+    padding: 120px 60px;
+  }
+  .section-header {
+    max-width: var(--max-width);
+    margin: 0 auto 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .section-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .section-line {
+    width: 60px;
+    height: 1px;
+    background: var(--color-accent);
+    margin-top: 20px;
+  }
+
+  /* ===== ABOUT ===== */
+  #about {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .about-text p {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    margin-bottom: 24px;
+    line-height: 2;
+  }
+  .about-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+    margin-top: 48px;
+  }
+  .stat-item {
+    border-top: 1px solid var(--color-border);
+    padding-top: 20px;
+  }
+  .stat-number {
+    font-family: var(--font-serif);
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    letter-spacing: 0.05em;
+  }
+  .about-image {
+    position: relative;
+    height: 500px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .about-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease-out);
+  }
+  .about-image:hover img {
+    transform: scale(1.03);
+  }
+  .about-image-overlay {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(200,168,124,0.15);
+    border-radius: 4px;
+    pointer-events: none;
+  }
+
+  /* ===== SERVICES ===== */
+  #services {
+    background: var(--color-surface);
+  }
+  .services-wrap {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--color-border);
+    margin-top: 0;
+  }
+  .service-card {
+    background: var(--color-surface);
+    padding: 48px 36px;
+    transition: background 0.4s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card:hover {
+    background: var(--color-card);
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--color-accent);
+    transition: width 0.6s var(--ease-out);
+  }
+  .service-card:hover::before {
+    width: 100%;
+  }
+  .service-icon {
+    font-size: 2rem;
+    margin-bottom: 24px;
+    display: block;
+    color: var(--color-accent);
+  }
+  .service-number {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  .service-card h3 {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--color-text);
+  }
+  .service-card p {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+    line-height: 1.8;
+  }
+  .service-arrow {
+    display: inline-block;
+    margin-top: 24px;
+    font-size: 0.8rem;
+    color: var(--color-accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.4s var(--ease-out);
+  }
+  .service-card:hover .service-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ===== PORTFOLIO ===== */
+  #portfolio {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .portfolio-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    padding: 8px 24px;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-sans);
+  }
+  .filter-btn:hover,
+  .filter-btn.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-bg);
+  }
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .project-card {
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    group: true;
+  }
+  .project-card.tall { grid-row: span 2; }
+  .project-img-wrap {
+    height: 100%;
+    min-height: 300px;
+    overflow: hidden;
+  }
+  .project-card.tall .project-img-wrap {
+    min-height: 624px;
+  }
+  .project-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease-out);
+  }
+  .project-card:hover .project-img-wrap img {
+    transform: scale(1.08);
+  }
+  .project-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.4) 40%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 32px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .project-card:hover .project-overlay {
+    opacity: 1;
+  }
+  .project-category {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 8px;
+  }
+  .project-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    transform: translateY(20px);
+    transition: transform 0.5s var(--ease-out);
+  }
+  .project-card:hover .project-title {
+    transform: translateY(0);
+  }
+  .project-location {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    transform: translateY(20px);
+    transition: transform 0.5s var(--ease-out) 0.05s;
+  }
+  .project-card:hover .project-location {
+    transform: translateY(0);
+  }
+  .project-view-btn {
+    margin-top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--color-accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transform: translateY(20px);
+    transition: transform 0.5s var(--ease-out) 0.1s;
+  }
+  .project-card:hover .project-view-btn {
+    transform: translateY(0);
+  }
+
+  /* ===== TIMELINE ===== */
+  #timeline {
+    background: var(--color-surface);
+  }
+  .timeline-wrap {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+  .timeline {
+    position: relative;
+    padding-left: 60px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 23px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-border);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 64px;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  .timeline-item:last-child { margin-bottom: 0; }
+  .timeline-dot {
+    position: absolute;
+    left: -48px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    border: 2px solid var(--color-bg);
+  }
+  .timeline-year {
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    line-height: 1;
+  }
+  .timeline-content h3 {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .timeline-content p {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.8;
+  }
+  .timeline-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .timeline-tag {
+    font-size: 0.7rem;
+    padding: 4px 12px;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ===== AWARDS ===== */
+  #awards {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .awards-marquee {
+    overflow: hidden;
+    margin-top: 60px;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+  .awards-track {
+    display: flex;
+    gap: 48px;
+    animation: marquee 30s linear infinite;
+    width: max-content;
+  }
+  .awards-track:hover {
+    animation-play-state: paused;
+  }
+  .award-item {
+    flex-shrink: 0;
+    padding: 32px 48px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    min-width: 360px;
+    transition: border-color 0.3s ease;
+  }
+  .award-item:hover {
+    border-color: var(--color-accent-dark);
+  }
+  .award-year-badge {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--color-accent);
+    margin-bottom: 12px;
+  }
+  .award-item h4 {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .award-item p {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ===== TEAM ===== */
+  #team {
+    background: var(--color-surface);
+  }
+  .team-wrap {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+  .team-card {
+    text-align: center;
+    padding: 40px 24px;
+    border-radius: 4px;
+    transition: background 0.4s ease;
+  }
+  .team-card:hover {
+    background: var(--color-card);
+  }
+  .team-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 24px;
+    overflow: hidden;
+    border: 2px solid var(--color-border);
+    transition: border-color 0.4s ease;
+  }
+  .team-card:hover .team-avatar {
+    border-color: var(--color-accent);
+  }
+  .team-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(80%);
+    transition: filter 0.5s ease;
+  }
+  .team-card:hover .team-avatar img {
+    filter: grayscale(0%);
+  }
+  .team-card h4 {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .team-role {
+    font-size: 0.8rem;
+    color: var(--color-accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+  }
+  .team-bio {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+
+  /* ===== PHILOSOPHY ===== */
+  #philosophy {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+  }
+  .philosophy-quote {
+    font-family: var(--font-serif);
+    font-size: clamp(1.6rem, 3vw, 2.8rem);
+    font-weight: 600;
+    line-height: 1.6;
+    max-width: 900px;
+    margin: 0 auto 32px;
+    color: var(--color-text);
+  }
+  .philosophy-quote em {
+    font-style: normal;
+    color: var(--color-accent);
+  }
+  .philosophy-author {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    letter-spacing: 0.15em;
+  }
+  .philosophy-divider {
+    width: 60px;
+    height: 1px;
+    background: var(--color-accent);
+    margin: 60px auto 0;
+  }
+
+  /* ===== CONTACT ===== */
+  #contact {
+    background: var(--color-surface);
+  }
+  .contact-wrap {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+  }
+  .contact-info h3 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+  }
+  .contact-info p {
+    color: var(--color-text-muted);
+    margin-bottom: 40px;
+    line-height: 1.9;
+  }
+  .contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .contact-item-icon {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .contact-item-text span {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .contact-item-text a,
+  .contact-item-text p {
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .form-group {
+    position: relative;
+  }
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 16px 0;
+    font-size: 0.9rem;
+    font-family: var(--font-sans);
+    color: var(--color-text);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-bottom-color: var(--color-accent);
+  }
+  .form-group textarea {
+    height: 120px;
+    resize: none;
+  }
+  .submit-btn {
+    align-self: flex-start;
+    padding: 16px 48px;
+    background: var(--color-accent);
+    color: var(--color-bg);
+    border: none;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.4s var(--ease-out);
+    position: relative;
+    overflow: hidden;
+  }
+  .submit-btn:hover {
+    background: var(--color-accent-light);
+    transform: translateY(-2px);
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    padding: 60px;
+    border-top: 1px solid var(--color-border);
+  }
+  .footer-wrap {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-logo {
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+  .footer-logo span { color: var(--color-accent); }
+  .footer-links {
+    display: flex;
+    gap: 32px;
+  }
+  .footer-links a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    transition: color 0.3s ease;
+  }
+  .footer-links a:hover { color: var(--color-accent); }
+  .footer-copy {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+  }
+
+  /* ===== REVEAL ANIMATIONS ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ===== BACK TO TOP ===== */
+  .back-to-top {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+    z-index: 100;
+  }
+  .back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+  .back-to-top:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1024px) {
+    section { padding: 80px 32px; }
+    nav { padding: 0 32px; }
+    .hero { padding: 0 32px; }
+    .about-grid { grid-template-columns: 1fr; gap: 48px; }
+    .about-image { height: 360px; }
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+    .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
+    .team-grid { grid-template-columns: repeat(2, 1fr); }
+    .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+    footer { padding: 40px 32px; }
+    .footer-wrap { flex-direction: column; gap: 24px; text-align: center; }
+    .section-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  }
+
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .nav-menu-btn { display: flex; }
+    .hero h1 { font-size: 2.4rem; }
+    .services-grid { grid-template-columns: 1fr; }
+    .portfolio-grid { grid-template-columns: 1fr; }
+    .project-card.tall { grid-row: span 1; }
+    .project-card.tall .project-img-wrap { min-height: 300px; }
+    .team-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .timeline { padding-left: 40px; }
+    .timeline-item { grid-template-columns: 1fr; gap: 12px; }
+    .timeline-dot { left: -32px; }
+    .timeline::before { left: 15px; }
+    .award-item { min-width: 280px; padding: 24px 32px; }
+    .cursor-dot, .cursor-ring { display: none; }
+  }
+
+  /* ===== IMAGE PLACEHOLDER ===== */
+  .img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a1a 0%, #252525 50%, #1a1a1a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* Grain overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9000;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+</style>
+</head>
+<body>
+
+<!-- Preloader -->
+<div id="preloader">
+  <div class="loader-line"></div>
+</div>
+
+<!-- Custom Cursor -->
+<div class="cursor-dot"></div>
+<div class="cursor-ring"></div>
+
+<!-- Navigation -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">筑境<span>·</span>设计</a>
+  <ul class="nav-links">
+    <li><a href="#about">关于我们</a></li>
+    <li><a href="#services">业务领域</a></li>
+    <li><a href="#portfolio">代表项目</a></li>
+    <li><a href="#timeline">发展历程</a></li>
+    <li><a href="#team">核心团队</a></li>
+    <li><a href="#contact">联系我们</a></li>
+  </ul>
+  <button class="nav-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('show')">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80" alt="城市规划天际线" class="hero-bg-img">
+  </div>
+  <div class="hero-content">
+    <p class="hero-label">城 市 规 划 与 建 筑 设 计 研 究 院</p>
+    <h1>以设计之力<br>重塑<em>城市未来</em></h1>
+    <p class="hero-desc">深耕城市规划设计二十年，我们以空间为媒介、以人文为内核，为每一座城市书写独属于它的建筑叙事。</p>
+  </div>
+  <div class="hero-scroll">
+    <span>向下探索</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- About -->
+<section id="about">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-label">About Us</p>
+      <h2 class="section-title">关于筑境</h2>
+      <div class="section-line"></div>
+    </div>
+  </div>
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <p>筑境设计成立于2004年，是一家集城市规划、建筑设计、景观设计、室内设计于一体的综合性设计研究机构。总部位于上海，在北京、深圳、成都设有分公司。</p>
+      <p>我们始终坚信，优秀的设计不仅是空间的塑造，更是城市文化的延续与生活方式的革新。从宏观的城市总体规划到微观的建筑节点设计，我们以跨学科的协作方式，为每个项目注入独特的场所精神。</p>
+      <p>二十年来，筑境已完成超过600个设计项目，覆盖全国28个省份，多次获得国家级、省部级优秀设计奖项。</p>
+      <div class="about-stats">
+        <div class="stat-item">
+          <div class="stat-number" data-count="20">0</div>
+          <div class="stat-label">年深耕经验</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-count="600">0</div>
+          <div class="stat-label">完成项目</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-count="28">0</div>
+          <div class="stat-label">覆盖省份</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-count="45">0</div>
+          <div class="stat-label">设计奖项</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-image reveal reveal-delay-2">
+      <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80" alt="建筑设计作品">
+      <div class="about-image-overlay"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section id="services">
+  <div class="services-wrap">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">Our Services</p>
+        <h2 class="section-title">业务领域</h2>
+        <div class="section-line"></div>
+      </div>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <span class="service-icon">🏙️</span>
+        <span class="service-number">01</span>
+        <h3>城市规划</h3>
+        <p>从战略规划到详细规划，提供全尺度城市空间发展解决方案，涵盖概念规划、总体规划、控制性详细规划等。</p>
+        <span class="service-arrow">探索更多 →</span>
+      </div>
+      <div class="service-card reveal reveal-delay-1">
+        <span class="service-icon">🏗️</span>
+        <span class="service-number">02</span>
+        <h3>建筑设计</h3>
+        <p>涵盖公共建筑、商业综合体、文化教育建筑、居住建筑等多种类型，从概念方案到施工图全流程服务。</p>
+        <span class="service-arrow">探索更多 →</span>
+      </div>
+      <div class="service-card reveal reveal-delay-2">
+        <span class="service-icon">🌿</span>
+        <span class="service-number">03</span>
+        <h3>景观设计</h3>
+        <p>城市公园、滨水景观、街道空间、居住区景观等，打造生态友好、人文关怀的公共空间系统。</p>
+        <span class="service-arrow">探索更多 →</span>
+      </div>
+      <div class="service-card reveal reveal-delay-3">
+        <span class="service-icon">🏠</span>
+        <span class="service-number">04</span>
+        <h3>室内设计</h3>
+        <p>办公空间、商业空间、文化展陈、高端住宅等室内设计，注重空间品质与用户体验的深度融合。</p>
+        <span class="service-arrow">探索更多 →</span>
+      </div>
+      <div class="service-card reveal">
+        <span class="service-icon">📐</span>
+        <span class="service-number">05</span>
+        <h3>城市更新</h3>
+        <p>旧城改造、历史街区保护、工业遗产活化，在延续城市文脉的同时注入当代活力。</p>
+        <span class="service-arrow">探索更多 →</span>
+      </div>
+      <div class="service-card reveal reveal-delay-1">
+        <span class="service-icon">🔌</span>
+        <span class="service-number">06</span>
+        <h3>乡村振兴</h3>
+        <p>美丽乡村规划、田园综合体设计、乡村公共空间营造，助力城乡融合与可持续发展。</p>
+        <span class="service-arrow">探索更多 →</span>
+      </div>
+      <div class="service-card reveal reveal-delay-2">
+        <span class="service-icon">📊</span>
+        <span class="service-number">07</span>
+        <h3>咨询研究</h3>
+        <p>城市发展策略、产业规划、交通规划、智慧城市等专项研究与咨询，为决策提供科学依据。</p>
+        <span class="service-arrow">探索更多 →</span>
+      </div>
+      <div class="service-card reveal reveal-delay-3">
+        <span class="service-icon">💡</span>
+        <span class="service-number">08</span>
+        <h3>BIM与数字化</h3>
+        <p>建筑信息模型(BIM)、参数化设计、数字孪生，以技术驱动设计创新与项目协同。</p>
+        <span class="service-arrow">探索更多 →</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Portfolio -->
+<section id="portfolio">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-label">Featured Works</p>
+      <h2 class="section-title">代表项目</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="portfolio-filters">
+      <button class="filter-btn active" data-filter="all">全部</button>
+      <button class="filter-btn" data-filter="urban">城市规划</button>
+      <button class="filter-btn" data-filter="arch">建筑设计</button>
+      <button class="filter-btn" data-filter="landscape">景观设计</button>
+      <button class="filter-btn" data-filter="renewal">城市更新</button>
+    </div>
+  </div>
+  <div class="portfolio-grid">
+    <div class="project-card tall reveal" data-category="urban">
+      <div class="project-img-wrap">
+        <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80" alt="滨水新城总体规划">
+      </div>
+      <div class="project-overlay">
+        <span class="project-category">城市规划</span>
+        <h3 class="project-title">钱塘滨水新城总体规划</h3>
+        <p class="project-location">浙江·杭州 | 2023</p>
+        <span class="project-view-btn">查看详情 →</span>
+      </div>
+    </div>
+    <div class="project-card reveal reveal-delay-1" data-category="arch">
+      <div class="project-img-wrap">
+        <img src="https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=800&q=80" alt="文化艺术中心">
+      </div>
+      <div class="project-overlay">
+        <span class="project-category">建筑设计</span>
+        <h3 class="project-title">云上文化艺术中心</h3>
+        <p class="project-location">四川·成都 | 2023</p>
+        <span class="project-view-btn">查看详情 →</span>
+      </div>
+    </div>
+    <div class="project-card reveal reveal-delay-2" data-category="landscape">
+      <div class="project-img-wrap">
+        <img src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=800&q=80" alt="湿地公园">
+      </div>
+      <div class="project-overlay">
+        <span class="project-category">景观设计</span>
+        <h3 class="project-title">西溪湿地生态修复工程</h3>
+        <p class="project-location">浙江·杭州 | 2022</p>
+        <span class="project-view-btn">查看详情 →</span>
+      </div>
+    </div>
+    <div class="project-card reveal" data-category="renewal">
+      <div class="project-img-wrap">
+        <img src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=800&q=80" alt="历史街区改造">
+      </div>
+      <div class="project-overlay">
+        <span class="project-category">城市更新</span>
+        <h3 class="project-title">苏州河畔工业遗产活化</h3>
+        <p class="project-location">上海 | 2022</p>
+        <span class="project-view-btn">查看详情 →</span>
+      </div>
+    </div>
+    <div class="project-card reveal reveal-delay-1" data-category="urban">
+      <div class="project-img-wrap">
+        <img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&q=80" alt="新区规划">
+      </div>
+      <div class="project-overlay">
+        <span class="project-category">城市规划</span>
+        <h3 class="project-title">粤港澳大湾区科创走廊规划</h3>
+        <p class="project-location">广东·深圳 | 2021</p>
+        <span class="project-view-btn">查看详情 →</span>
+      </div>
+    </div>
+    <div class="project-card reveal reveal-delay-2" data-category="arch">
+      <div class="project-img-wrap">
+        <img src="https://images.unsplash.com/photo-1577495508048-b635879837f1?w=800&q=80" alt="综合体设计">
+      </div>
+      <div class="project-overlay">
+        <span class="project-category">建筑设计</span>
+        <h3 class="project-title">星河TOD商业综合体</h3>
+        <p class="project-location">广东·广州 | 2021</p>
+        <span class="project-view-btn">查看详情 →</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Timeline -->
+<section id="timeline">
+  <div class="timeline-wrap">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">Our Journey</p>
+        <h2 class="section-title">发展历程</h2>
+        <div class="section-line"></div>
+      </div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2024</div>
+        <div class="timeline-content">
+          <h3>品牌焕新与数字化转型</h3>
+          <p>全面升级品牌视觉体系，启动BIM全流程数字化设计平台，获得国家高新技术企业认证。</p>
+          <div class="timeline-tags">
+            <span class="timeline-tag">品牌升级</span>
+            <span class="timeline-tag">数字化转型</span>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2020</div>
+        <div class="timeline-content">
+          <h3>全国布局完成</h3>
+          <p>成都分公司正式运营，形成上海、北京、深圳、成都四地协同布局，年设计产值突破2亿元。</p>
+          <div class="timeline-tags">
+            <span class="timeline-tag">全国布局</span>
+            <span class="timeline-tag">规模突破</span>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2016</div>
+        <div class="timeline-content">
+          <h3>城市更新战略启动</h3>
+          <p>成立城市更新研究中心，承接上海苏州河畔、北京首钢等大型城市更新项目，累计完成城市更新面积超200万㎡。</p>
+          <div class="timeline-tags">
+            <span class="timeline-tag">城市更新</span>
+            <span class="timeline-tag">研究中心</span>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2012</div>
+        <div class="timeline-content">
+          <h3>首个国家级奖项</h3>
+          <p>「西湖文化广场综合改造项目」荣获全国优秀城乡规划设计一等奖，标志着设计品质跻身国内一流。</p>
+          <div class="timeline-tags">
+            <span class="timeline-tag">国家级奖项</span>
+            <span class="timeline-tag">品质突破</span>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2004</div>
+        <div class="timeline-content">
+          <h3>筑境设计创立</h3>
+          <p>由三位海归建筑师在上海联合创办，以「筑以载道，境由心生」为设计理念，致力于中国城市空间的品质提升。</p>
+          <div class="timeline-tags">
+            <span class="timeline-tag">创立</span>
+            <span class="timeline-tag">上海</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Philosophy -->
+<section id="philosophy">
+  <div class="reveal">
+    <p class="section-label" style="text-align:center; margin-bottom: 48px;">Design Philosophy</p>
+    <blockquote class="philosophy-quote">
+      "建筑不是静止的纪念碑，而是<em>流动的叙事</em>。我们设计的不是空间本身，而是空间中即将发生的<em>生活</em>。"
+    </blockquote>
+    <p class="philosophy-author">— 筑境设计创始宣言</p>
+    <div class="philosophy-divider"></div>
+  </div>
+</section>
+
+<!-- Awards -->
+<section id="awards">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-label">Awards</p>
+      <h2 class="section-title">荣誉奖项</h2>
+      <div class="section-line"></div>
+    </div>
+  </div>
+  <div class="awards-marquee">
+    <div class="awards-track">
+      <div class="award-item">
+        <p class="award-year-badge">2024</p>
+        <h4>亚洲建筑师协会金奖</h4>
+        <p>钱塘滨水新城总体规划</p>
+      </div>
+      <div class="award-item">
+        <p class="award-year-badge">2023</p>
+        <h4>全国优秀城乡规划设计一等奖</h4>
+        <p>粤港澳大湾区科创走廊规划</p>
+      </div>
+      <div class="award-item">
+        <p class="award-year-badge">2023</p>
+        <h4>中国建筑学会建筑设计金奖</h4>
+        <p>云上文化艺术中心</p>
+      </div>
+      <div class="award-item">
+        <p class="award-year-badge">2022</p>
+        <h4>WA中国建筑奖</h4>
+        <p>苏州河畔工业遗产活化</p>
+      </div>
+      <div class="award-item">
+        <p class="award-year-badge">2021</p>
+        <h4>世界建筑节年度最佳公共建筑</h4>
+        <p>星河TOD商业综合体</p>
+      </div>
+      <div class="award-item">
+        <p class="award-year-badge">2020</p>
+        <h4>全国优秀工程勘察设计一等奖</h4>
+        <p>西溪湿地生态修复工程</p>
+      </div>
+      <!-- Duplicate for seamless loop -->
+      <div class="award-item">
+        <p class="award-year-badge">2024</p>
+        <h4>亚洲建筑师协会金奖</h4>
+        <p>钱塘滨水新城总体规划</p>
+      </div>
+      <div class="award-item">
+        <p class="award-year-badge">2023</p>
+        <h4>全国优秀城乡规划设计一等奖</h4>
+        <p>粤港澳大湾区科创走廊规划</p>
+      </div>
+      <div class="award-item">
+        <p class="award-year-badge">2023</p>
+        <h4>中国建筑学会建筑设计金奖</h4>
+        <p>云上文化艺术中心</p>
+      </div>
+      <div class="award-item">
+        <p class="award-year-badge">2022</p>
+        <h4>WA中国建筑奖</h4>
+        <p>苏州河畔工业遗产活化</p>
+      </div>
+      <div class="award-item">
+        <p class="award-year-badge">2021</p>
+        <h4>世界建筑节年度最佳公共建筑</h4>
+        <p>星河TOD商业综合体</p>
+      </div>
+      <div class="award-item">
+        <p class="award-year-badge">2020</p>
+        <h4>全国优秀工程勘察设计一等奖</h4>
+        <p>西溪湿地生态修复工程</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Team -->
+<section id="team">
+  <div class="team-wrap">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">Core Team</p>
+        <h2 class="section-title">核心团队</h2>
+        <div class="section-line"></div>
+      </div>
+    </div>
+    <div class="team-grid">
+      <div class="team-card reveal">
+        <div class="team-avatar">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80" alt="陈明远">
+        </div>
+        <h4>陈明远</h4>
+        <p class="team-role">创始人 / 首席建筑师</p>
+        <p class="team-bio">哈佛大学GSD建筑学硕士，原华东建筑设计研究院副总建筑师，主持设计项目超过200个。</p>
+      </div>
+      <div class="team-card reveal reveal-delay-1">
+        <div class="team-avatar">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&q=80" alt="林若溪">
+        </div>
+        <h4>林若溪</h4>
+        <p class="team-role">联合创始人 / 规划总监</p>
+        <p class="team-bio">MIT城市规划博士，专注区域发展与城市更新策略，参与多项国家级规划课题。</p>
+      </div>
+      <div class="team-card reveal reveal-delay-2">
+        <div class="team-avatar">
+          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&q=80" alt="张瀚文">
+        </div>
+        <h4>张瀚文</h4>
+        <p class="team-role">技术总监 / BIM负责人</p>
+        <p class="team-bio">清华大学建筑学硕士，国家一级注册建筑师，推动公司全面数字化转型与参数化设计应用。</p>
+      </div>
+      <div class="team-card reveal reveal-delay-3">
+        <div class="team-avatar">
+          <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&q=80" alt="苏婉清">
+        </div>
+        <h4>苏婉清</h4>
+        <p class="team-role">景观总监</p>
+        <p class="team-bio">宾夕法尼亚大学景观建筑学硕士，ALSA获奖设计师，擅长生态景观与城市公共空间营造。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section id="contact">
+  <div class="contact-wrap">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">Get in Touch</p>
+        <h2 class="section-title">联系我们</h2>
+        <div class="section-line"></div>
+      </div>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <h3>期待与您携手<br>共筑美好城市</h3>
+        <p>无论您是政府机构、开发企业还是学术机构，我们都期待与您展开深度合作。请随时与我们取得联系。</p>
+        <div class="contact-details">
+          <div class="contact-item">
+            <div class="contact-item-icon">📍</div>
+            <div class="contact-item-text">
+              <span>总部地址</span>
+              <p>上海市黄浦区南京东路388号 筑境大厦 28F</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">📞</div>
+            <div class="contact-item-text">
+              <span>联系电话</span>
+              <p>021-6388-8888</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">✉️</div>
+            <div class="contact-item-text">
+              <span>电子邮箱</span>
+              <a href="mailto:hello@zhujing-design.com">hello@zhujing-design.com</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <form class="contact-form reveal reveal-delay-2" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <input type="text" placeholder="您的姓名" required>
+          </div>
+          <div class="form-group">
+            <input type="text" placeholder="所属单位">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <input type="email" placeholder="电子邮箱" required>
+          </div>
+          <div class="form-group">
+            <input type="tel" placeholder="联系电话">
+          </div>
+        </div>
+        <div class="form-group">
+          <textarea placeholder="请简要描述您的项目需求..."></textarea>
+        </div>
+        <button type="submit" class="submit-btn">提交咨询</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-wrap">
+    <div class="footer-logo">筑境<span>·</span>设计</div>
+    <div class="footer-links">
+      <a href="#">隐私政策</a>
+      <a href="#">服务条款</a>
+      <a href="#">加入我们</a>
+      <a href="#">微信公众号</a>
+    </div>
+    <p class="footer-copy">© 2024 筑境设计研究院 版权所有 | 沪ICP备XXXXXXXX号</p>
+  </div>
+</footer>
+
+<!-- Back to Top -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // ===== PRELOADER =====
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('preloader').classList.add('hidden');
+    }, 800);
+  });
+
+  // ===== CUSTOM CURSOR =====
+  const dot = document.querySelector('.cursor-dot');
+  const ring = document.querySelector('.cursor-ring');
+  let mouseX = 0, mouseY = 0;
+  let ringX = 0, ringY = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.left = mouseX - 4 + 'px';
+    dot.style.top = mouseY - 4 + 'px';
+  });
+
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.left = ringX + 'px';
+    ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, .project-card, .service-card').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+  });
+
+  // ===== NAVBAR SCROLL =====
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 80);
+    document.getElementById('backToTop').classList.toggle('visible', window.scrollY > 600);
+  });
+
+  // ===== REVEAL ON SCROLL =====
+  const revealElements = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+  revealElements.forEach(el => revealObserver.observe(el));
+
+  // ===== COUNTER ANIMATION =====
+  const statNumbers = document.querySelectorAll('.stat-number[data-count]');
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.count);
+        let current = 0;
+        const step = Math.ceil(target / 60);
+        const timer = setInterval(() => {
+          current += step;
+          if (current >= target) {
+            current = target;
+            clearInterval(timer);
+          }
+          el.textContent = current + '+';
+        }, 25);
+        counterObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  statNumbers.forEach(el => counterObserver.observe(el));
+
+  // ===== PORTFOLIO FILTER =====
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const projectCards = document.querySelectorAll('.project-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+
+      projectCards.forEach(card => {
+        if (filter === 'all' || card.dataset.category === filter) {
+          card.style.display = '';
+          setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 50);
+        } else {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px)';
+          setTimeout(() => { card.style.display = 'none'; }, 400);
+        }
+      });
+    });
+  });
+
+  // ===== SMOOTH SCROLL FOR NAV LINKS =====
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // ===== FORM SUBMIT =====
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.submit-btn');
+    btn.textContent = '已提交 ✓';
+    btn.style.background = '#2a6b4f';
+    btn.style.pointerEvents = 'none';
+    setTimeout(() => {
+      btn.textContent = '提交咨询';
+      btn.style.background = '';
+      btn.style.pointerEvents = '';
+      e.target.reset();
+    }, 3000);
+  }
+
+  // ===== PARALLAX EFFECT ON HERO =====
+  window.addEventListener('scroll', () => {
+    const hero = document.querySelector('.hero-bg-img');
+    if (hero) {
+      const scrolled = window.scrollY;
+      hero.style.transform = `scale(1.05) translateY(${scrolled * 0.3}px)`;
+    }
+  });
+</script>
+</body>
+</html>
